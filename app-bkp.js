@@ -23,12 +23,11 @@ let auth = function(req, res, next){
   }
 }
 const app = express();
-const port = 3000;
+const port = 4000;
 
 app.use(bodyParser.json());
-const QGTUNNEL_HOST = process.env.QGTUNNEL_HOST;
-const QGTUNNEL_PORT = process.env.QGTUNNEL_PORT;
 
+//SERVICIO DE CARGA DE ARCHIVO EN SERVIDOR SFTP
 app.post('/uploadFile', auth, async (req, res) => {
 
   const fileName = req[`body`][`fileName`];
@@ -40,12 +39,11 @@ app.post('/uploadFile', auth, async (req, res) => {
   const remotePath2 = req[`body`][`remotePath`];
   const respuesta = await axios.get(fileUrl);
 
-  console.log(`43. fileName: ${fileName} - fileUrl: ${fileUrl} - host: ${host} - port: ${port} - username: ${username} - password: ${password} - remotePath: ${remotePath2}\n`);
-  console.log(`44. QGTUNNEL_HOST: ${QGTUNNEL_HOST} - QGTUNNEL_PORT: ${QGTUNNEL_PORT}\n`);
-  
+  console.log(`24. fileName: ${fileName} - fileUrl: ${fileUrl} - host: ${host} - port: ${port} - username: ${username} - password: ${password} - remotePath: ${remotePath2}\n`);
+
   const sftpConfig = {
-    host: QGTUNNEL_HOST,
-    port: QGTUNNEL_PORT,
+    host: host,
+    port: port,
     username: username,
     password: password,
     algorithms: {
@@ -88,7 +86,7 @@ app.post('/uploadFile', auth, async (req, res) => {
     await conn.connect(sftpConfig);
 
     conn.on('ready', () => {
-      console.log(`91. Host: ${host} - Conexión SFTP ready`);
+      console.log(`71. Host: ${host} - Conexión SFTP ready`);
 
       //Armado de rutas
       const localPath = `ArchivosTXT/${fileName}`;
@@ -97,7 +95,7 @@ app.post('/uploadFile', auth, async (req, res) => {
       //Se genera archivo TXT en carpeta del proyecto
       require('fs').writeFileSync(localPath, respuesta.data, 'utf-8');
 
-      console.log(`100. Host: ${host} - localPath: ${localPath} - remotePath: ${remotePath}\n`);
+      console.log(`80. Host: ${host} - localPath: ${localPath} - remotePath: ${remotePath}\n`);
       
       conn.sftp((err, sftp) => {
         if (err)
@@ -194,12 +192,11 @@ app.post('/searchFile', auth, async (req, res) => {
   const remotePath = req[`body`][`remotePath`];
   const password = req[`body`][`password`];
 
-  console.log(`197. fileName: ${fileName} - host: ${host} - port: ${port} - username: ${username} - password: ${password} - remotePath: ${remotePath}\n`);
-  console.log(`198. QGTUNNEL_HOST: ${QGTUNNEL_HOST} - QGTUNNEL_PORT: ${QGTUNNEL_PORT}\n`);
+  console.log(`177. fileName: ${fileName} - host: ${host} - port: ${port} - username: ${username} - password: ${password} - remotePath: ${remotePath}\n`);
   
   const sftpConfig = {
-    host: QGTUNNEL_HOST,
-    port: QGTUNNEL_PORT,
+    host: host,
+    port: port,
     username: username,
     password: password,
     algorithms: {
@@ -243,7 +240,7 @@ app.post('/searchFile', auth, async (req, res) => {
 
     conn.on(`ready`, () => {
       
-      console.log(`246. Host: ${host} - Conexión SFTP ready`);
+      console.log(`225. Host: ${host} - Conexión SFTP ready`);
 
       conn.sftp((err, sftp) => {
         if (err)
@@ -281,14 +278,14 @@ app.post('/searchFile', auth, async (req, res) => {
           }
           
           const nombresArchivos = listaArchivos.map((archivo) => archivo.filename);
-          console.log(`284. Host: ${host} - Directorio: ${remotePath} - Nombres de archivos encontrados: ${nombresArchivos}`);
+          console.log(`263. Host: ${host} - Directorio: ${remotePath} - Nombres de archivos encontrados: ${nombresArchivos}`);
 
           //Busqueda de archivo especifico
           const archivoEncontrado = listaArchivos.find((archivo) => archivo.filename === fileName);
   
           if (archivoEncontrado)
           {
-            console.log(`291. Host: ${host} - Directorio: ${remotePath} - Nombre archivo: ${fileName} - Archivo encontrado`);
+            console.log(`270. Host: ${host} - Directorio: ${remotePath} - Nombre archivo: ${fileName} - Archivo encontrado`);
 
             //Extracción de contenido del archivo
             const readStream = sftp.createReadStream(`${remotePath}/${fileName}`);
@@ -303,7 +300,7 @@ app.post('/searchFile', auth, async (req, res) => {
             // Acciones al abrir el archivo para lectura
               readStream.pipe(concatStream((contenido) =>
               {
-                console.log(`306. Host: ${host} - Directorio: ${remotePath} - Nombre archivo: ${fileName} - Contenido: ${contenido.toString()}`);
+                console.log(`277. Host: ${host} - Directorio: ${remotePath} - Nombre archivo: ${fileName} - Contenido: ${contenido.toString()}`);
                 let message = `Host: ${host} - Directorio: ${remotePath} - Nombre archivo: ${fileName} - Archivo encontrado`;
 
                 res.status(200).json({
@@ -383,12 +380,11 @@ app.post('/searchFiles', auth, async (req, res) => {
   const remotePath = req[`body`][`remotePath`];
   const password = req[`body`][`password`];
 
-  console.log(`386. host: ${host} - port: ${port} - username: ${username} - password: ${password} - remotePath: ${remotePath}\n`);
-  console.log(`387. QGTUNNEL_HOST: ${QGTUNNEL_HOST} - QGTUNNEL_PORT: ${QGTUNNEL_PORT}\n`);
+  console.log(`177. host: ${host} - port: ${port} - username: ${username} - password: ${password} - remotePath: ${remotePath}\n`);
   
   const sftpConfig = {
-    host: QGTUNNEL_HOST,
-    port: QGTUNNEL_PORT,
+    host: host,
+    port: port,
     username: username,
     password: password,
     algorithms: {
@@ -432,7 +428,7 @@ app.post('/searchFiles', auth, async (req, res) => {
 
     conn.on(`ready`, () => {
       
-      console.log(`435. Host: ${host} - Conexión SFTP ready`);
+      console.log(`225. Host: ${host} - Conexión SFTP ready`);
 
       conn.sftp((err, sftp) => {
         if (err)
@@ -468,11 +464,11 @@ app.post('/searchFiles', auth, async (req, res) => {
           let fileName_array = [];
 
           for(let i =0; i < listaArchivos.length; i++){
-            console.log(`471. Host: ${host} - Directorio: ${remotePath} - Archivos: ${JSON.stringify(listaArchivos[i])}`);
+            console.log(`263. Host: ${host} - Directorio: ${remotePath} - Archivos: ${JSON.stringify(listaArchivos[i])}`);
             const fileName = listaArchivos[i].filename;
             fileName_array.push(fileName);
           }
-          console.log(`475. listaArchivos: ${JSON.stringify(fileName_array)}`);
+          console.log(`453. listaArchivos: ${JSON.stringify(fileName_array)}`);
           let message = `Host: ${host} - Conexión SFTP exito - servicio searchFiles`;
 
           res.status(200).json({
@@ -522,13 +518,6 @@ app.post('/searchFiles', auth, async (req, res) => {
 
 });
 
-//SERVICIO DESTINADO A PROBAR LA DISPONIBLIDAD DE LA APLICACION
-app.get("/", auth, (req, res) => {
-	res.json({
-		Status: 'OK'
-	})
-});
-
 //SERVICIO DE BUSQUEDA DE ARCHIVOS EN SERVIDOR SFPT
 app.post('/deleteFile', auth, async (req, res) => {
 
@@ -539,11 +528,11 @@ app.post('/deleteFile', auth, async (req, res) => {
   const remotePath = req[`body`][`remotePath`];
   const password = req[`body`][`password`];
 
-  console.log(`542. fileName: ${fileName} - host: ${host} - port: ${port} - username: ${username} - password: ${password} - remotePath: ${remotePath}\n`);
-  console.log(`543. QGTUNNEL_HOST: ${QGTUNNEL_HOST} - QGTUNNEL_PORT: ${QGTUNNEL_PORT}\n`);
+  console.log(`177. fileName: ${fileName} - host: ${host} - port: ${port} - username: ${username} - password: ${password} - remotePath: ${remotePath}\n`);
+  
   const sftpConfig = {
-    host: QGTUNNEL_HOST,
-    port: QGTUNNEL_PORT,
+    host: host,
+    port: port,
     username: username,
     password: password,
     algorithms: {
@@ -587,7 +576,7 @@ app.post('/deleteFile', auth, async (req, res) => {
 
     conn.on(`ready`, () => {
       
-      console.log(`590. Host: ${host} - Conexión SFTP ready`);
+      console.log(`561. Host: ${host} - Conexión SFTP ready`);
 
       conn.sftp((err, sftp) => {
         if (err)
@@ -625,20 +614,20 @@ app.post('/deleteFile', auth, async (req, res) => {
           }
           
           const nombresArchivos = listaArchivos.map((archivo) => archivo.filename);
-          console.log(`628. Host: ${host} - Directorio: ${remotePath} - Nombres de archivos encontrados: ${nombresArchivos}`);
+          console.log(`599. Host: ${host} - Directorio: ${remotePath} - Nombres de archivos encontrados: ${nombresArchivos}`);
 
           //Busqueda de archivo especifico
           const archivoEncontrado = listaArchivos.find((archivo) => archivo.filename === fileName);
   
           if (archivoEncontrado)
           {
-            console.log(`635. Host: ${host} - Directorio: ${remotePath} - Nombre archivo: ${fileName} - Archivo encontrado: ${archivoEncontrado}`);
+            console.log(`606. Host: ${host} - Directorio: ${remotePath} - Nombre archivo: ${fileName} - Archivo encontrado: ${archivoEncontrado}`);
 
             sftp.unlink(`${remotePath}${fileName}`, (unlinkErr) => {
               if (unlinkErr) {
 
                 let message = `Host: ${host} - Directorio: ${remotePath} - Nombre archivo: ${fileName} - Error al intentar eliminar archivo - Detalle: ${unlinkErr}`;
-                console.log(`641. ${message}`);
+                console.log(`612. ${message}`);
 
                 res.status(500).json({
                   error: false,
@@ -656,7 +645,7 @@ app.post('/deleteFile', auth, async (req, res) => {
               {
                 
                 let message = `Host: ${host} - Directorio: ${remotePath} - Nombre archivo: ${fileName} eliminado correctamente`;
-                console.log(`659. ${message}`);
+                console.log(`630. ${message}`);
     
                 res.status(200).json({
                   error: false,
@@ -674,7 +663,7 @@ app.post('/deleteFile', auth, async (req, res) => {
           else
           {
             let message = `Host: ${host} - Directorio: ${remotePath} - Nombre archivo: ${fileName} - Archivo no encontrado`;
-            console.log(`677. ${message}`);
+            console.log(`648. ${message}`);
             res.status(500).json({
               error: true,
               message: message,
@@ -697,7 +686,7 @@ app.post('/deleteFile', auth, async (req, res) => {
       
       let message = `Host: ${host} - Conexión SFTP error - servicio deleteFile - Detalle: ${JSON.stringify(err.message)}`;
 
-      console.log(`700. ${message}`);
+      console.log(`671. ${message}`);
 
       res.status(500).json({
         error: true,
@@ -725,18 +714,25 @@ app.post('/deleteFile', auth, async (req, res) => {
 });
 
 //SERVICIO DESTINADO A PROBAR LA DISPONIBLIDAD DE LA APLICACION
+app.get("/", auth, (req, res) => {
+	res.json({
+		Status: 'OK'
+	})
+}); 
+
+//SERVICIO DESTINADO A PROBAR LA DISPONIBLIDAD DE LA APLICACION
 app.get("/getJWT", (req, res) => {
   const token = req.header('x-auth-token');
-  console.log(`730. token: ${token}\n`);
+  console.log(`12. token: ${token}\n`);
   if(!token)
     return res.status(401).json({
     error: true,
     message: 'Sin token, no tienes autorizacion'
   });
   try{
-    console.log(`737. process.env.API_KEY: ${process.env.API_KEY}`);
+    console.log(`16. process.env.API_KEY: ${process.env.API_KEY}`);
     const JWT = jwt.sign("{}", token);
-    console.log(`739. JWT: ${JWT}`);
+    console.log(`16. JWT: ${JWT}`);
     const decoded = jwt.verify(JWT, process.env.API_KEY); // Si el API_KEY coincide, devuelve el payload, sino tira un error.
     res.status(200).json({   
       error: false,
